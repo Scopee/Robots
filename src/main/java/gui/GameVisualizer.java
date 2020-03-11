@@ -98,30 +98,21 @@ public class GameVisualizer extends JPanel {
     private static double applyLimits(double value, double min, double max) {
         if (value < min)
             return min;
-        if (value > max)
-            return max;
-        return value;
+        return Math.min(value, max);
     }
 
     private void moveRobot(double velocity, double angularVelocity, double duration) {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        double newX = robotPositionX + velocity / angularVelocity *
-                (Math.sin(robotDirection + angularVelocity * duration) -
-                        Math.sin(robotDirection));
-        if (!Double.isFinite(newX)) {
-            newX = robotPositionX + velocity * duration * Math.cos(robotDirection);
+        double angleToTarget = angleTo(robotPositionX, robotPositionY, targetPositionX, targetPositionY);
+        if (Math.abs(angleToTarget - robotDirection) < 0.1) {
+            double newX = robotPositionX + Math.cos(angleToTarget) * duration * velocity;
+            robotPositionX = newX;
+            double newY = robotPositionY + Math.sin(angleToTarget) * duration * velocity;
+            robotPositionY = newY;
+        } else {
+            robotDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
         }
-        double newY = robotPositionY - velocity / angularVelocity *
-                (Math.cos(robotDirection + angularVelocity * duration) -
-                        Math.cos(robotDirection));
-        if (!Double.isFinite(newY)) {
-            newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
-        }
-        robotPositionX = newX;
-        robotPositionY = newY;
-        double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
-        robotDirection = newDirection;
     }
 
     private static double asNormalizedRadians(double angle) {
