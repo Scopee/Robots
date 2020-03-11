@@ -1,21 +1,14 @@
 package gui;
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
+import log.Logger;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.swing.*;
-
-import log.Logger;
-
-/**
- * Что требуется сделать:
- * 1. Метод создания меню перегружен функционалом и трудно читается.
- * Следует разделить его на серию более простых методов (или вообще выделить отдельный класс).
- */
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
@@ -29,7 +22,7 @@ public class MainApplicationFrame extends JFrame {
                 screenSize.height - inset * 2);
 
         setContentPane(desktopPane);
-
+        addWindowListener(new WindowListener(this));
 
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow);
@@ -39,7 +32,7 @@ public class MainApplicationFrame extends JFrame {
         addWindow(gameWindow);
 
         setJMenuBar(generateMenuBar());
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
     protected LogWindow createLogWindow() {
@@ -54,6 +47,9 @@ public class MainApplicationFrame extends JFrame {
 
     protected void addWindow(JInternalFrame frame) {
         desktopPane.add(frame);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        FrameListener listener = new FrameListener(frame);
+        frame.addInternalFrameListener(listener);
         frame.setVisible(true);
     }
 
@@ -88,10 +84,8 @@ public class MainApplicationFrame extends JFrame {
 
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-
         JMenu lookAndFeelMenu = createLookAndFeelMenu();
         JMenu testMenu = createTestMenu();
-
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         return menuBar;
@@ -99,6 +93,7 @@ public class MainApplicationFrame extends JFrame {
 
     private JMenu createLookAndFeelMenu() {
         JMenu lookAndFeelMenu = new JMenu("Режим отображения");
+        Logger.debug("Create Look And Feel Menu");
         lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
         lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
                 "Управление режимом отображения приложения");
@@ -112,6 +107,10 @@ public class MainApplicationFrame extends JFrame {
             setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
             this.invalidate();
         });
+        menuItems.put("Выход", (event) -> {
+            if (FrameListener.dialogAnswer(this) == JOptionPane.YES_OPTION)
+                System.exit(0);
+        });
 
         for (Map.Entry<String, ActionListener> entry : menuItems.entrySet()) {
             JMenuItem item = createMenuItem(entry.getKey(), entry.getValue());
@@ -123,19 +122,18 @@ public class MainApplicationFrame extends JFrame {
 
     private JMenu createTestMenu() {
         JMenu testMenu = new JMenu("Тесты");
+        Logger.debug("Create Test Menu");
         testMenu.setMnemonic(KeyEvent.VK_T);
         testMenu.getAccessibleContext().setAccessibleDescription(
                 "Тестовые команды");
-
-        {
-            JMenuItem addLogMessageItem = createMenuItem("Сообщение в лог",
-                    (event) -> Logger.debug("Новая строка"));
-            testMenu.add(addLogMessageItem);
-        }
+        JMenuItem addLogMessageItem = createMenuItem("Сообщение в лог",
+                (event) -> Logger.debug("Новая строка"));
+        testMenu.add(addLogMessageItem);
         return testMenu;
     }
 
     private JMenuItem createMenuItem(String text, ActionListener listener) {
+        Logger.debug("Create Menu Item. Text: " + text);
         JMenuItem item = new JMenuItem(text, KeyEvent.VK_S);
         item.addActionListener(listener);
         return item;

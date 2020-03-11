@@ -1,15 +1,11 @@
 package gui;
 
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-import java.awt.TextArea;
-
-import javax.swing.JInternalFrame;
-import javax.swing.JPanel;
-
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
+
+import javax.swing.*;
+import java.awt.*;
 
 public class LogWindow extends JInternalFrame implements LogChangeListener {
     private LogWindowSource logSource;
@@ -20,8 +16,8 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
         this.logSource = logSource;
         this.logSource.registerListener(this);
         logContent = new TextArea("");
-        logContent.setSize(200, 500);
-
+        logContent.setBackground(Color.WHITE);
+        logContent.setSize(500, 500);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(logContent, BorderLayout.CENTER);
         getContentPane().add(panel);
