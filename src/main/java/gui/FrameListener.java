@@ -28,7 +28,9 @@ public class FrameListener implements InternalFrameListener {
 
     @Override
     public void internalFrameClosed(InternalFrameEvent e) {
-
+        if (e.getInternalFrame() instanceof LogChangeListener) {
+            ((LogChangeListener) e.getInternalFrame()).unregister();
+        }
     }
 
     @Override
