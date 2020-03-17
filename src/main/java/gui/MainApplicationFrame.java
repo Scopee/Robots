@@ -12,6 +12,7 @@ import java.util.Map;
 public class MainApplicationFrame extends JFrame {
     private final JDesktopPane desktopPane = new JDesktopPane();
 
+
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
@@ -53,83 +54,43 @@ public class MainApplicationFrame extends JFrame {
         frame.setVisible(true);
     }
 
-//    protected JMenuBar createMenuBar() {
-//        JMenuBar menuBar = new JMenuBar();
-// 
-//        //Set up the lone menu.
-//        JMenu menu = new JMenu("Document");
-//        menu.setMnemonic(KeyEvent.VK_D);
-//        menuBar.add(menu);
-// 
-//        //Set up the first menu item.
-//        JMenuItem menuItem = new JMenuItem("New");
-//        menuItem.setMnemonic(KeyEvent.VK_N);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_N, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("new");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        //Set up the second menu item.
-//        menuItem = new JMenuItem("Quit");
-//        menuItem.setMnemonic(KeyEvent.VK_Q);
-//        menuItem.setAccelerator(KeyStroke.getKeyStroke(
-//                KeyEvent.VK_Q, ActionEvent.ALT_MASK));
-//        menuItem.setActionCommand("quit");
-////        menuItem.addActionListener(this);
-//        menu.add(menuItem);
-// 
-//        return menuBar;
-//    }
-
     private JMenuBar generateMenuBar() {
         JMenuBar menuBar = new JMenuBar();
-        JMenu lookAndFeelMenu = createLookAndFeelMenu();
-        JMenu testMenu = createTestMenu();
+        HashMap<String, ActionListener> lookAndFeelItems = new HashMap<>();
+        lookAndFeelItems.put("Системная схема", (event) -> {
+            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            this.invalidate();
+        });
+        lookAndFeelItems.put("Универсальная схема", (event) -> {
+            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
+            this.invalidate();
+        });
+        lookAndFeelItems.put("Выход", (event) -> {
+            if (FrameListener.dialogAnswer(this) == JOptionPane.YES_OPTION)
+                System.exit(0);
+        });
+        JMenu lookAndFeelMenu = createMenu("Режим отображения",
+                KeyEvent.VK_V,
+                "Управление режимом отображения приложения",
+                lookAndFeelItems);
+        HashMap<String, ActionListener> testItems = new HashMap<>();
+        testItems.put("Сообщение в лог",
+                (event) -> Logger.debug("Новая строка"));
+        JMenu testMenu = createMenu("Тесты", KeyEvent.VK_T, "Тестовые команды", testItems);
         menuBar.add(lookAndFeelMenu);
         menuBar.add(testMenu);
         return menuBar;
     }
 
-    private JMenu createLookAndFeelMenu() {
-        JMenu lookAndFeelMenu = new JMenu("Режим отображения");
-        Logger.debug("Create Look And Feel Menu");
-        lookAndFeelMenu.setMnemonic(KeyEvent.VK_V);
-        lookAndFeelMenu.getAccessibleContext().setAccessibleDescription(
-                "Управление режимом отображения приложения");
-
-        HashMap<String, ActionListener> menuItems = new HashMap<>();
-        menuItems.put("Системная схема", (event) -> {
-            setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            this.invalidate();
-        });
-        menuItems.put("Универсальная схема", (event) -> {
-            setLookAndFeel(UIManager.getCrossPlatformLookAndFeelClassName());
-            this.invalidate();
-        });
-        menuItems.put("Выход", (event) -> {
-            if (FrameListener.dialogAnswer(this) == JOptionPane.YES_OPTION)
-                System.exit(0);
-        });
-
+    private JMenu createMenu(String name, int mnemonic, String descriptor, HashMap<String, ActionListener> menuItems) {
+        JMenu menu = new JMenu(name);
+        menu.setMnemonic(mnemonic);
+        menu.getAccessibleContext().setAccessibleDescription(descriptor);
         for (Map.Entry<String, ActionListener> entry : menuItems.entrySet()) {
             JMenuItem item = createMenuItem(entry.getKey(), entry.getValue());
-            lookAndFeelMenu.add(item);
+            menu.add(item);
         }
-
-        return lookAndFeelMenu;
-    }
-
-    private JMenu createTestMenu() {
-        JMenu testMenu = new JMenu("Тесты");
-        Logger.debug("Create Test Menu");
-        testMenu.setMnemonic(KeyEvent.VK_T);
-        testMenu.getAccessibleContext().setAccessibleDescription(
-                "Тестовые команды");
-        JMenuItem addLogMessageItem = createMenuItem("Сообщение в лог",
-                (event) -> Logger.debug("Новая строка"));
-        testMenu.add(addLogMessageItem);
-        return testMenu;
+        return menu;
     }
 
     private JMenuItem createMenuItem(String text, ActionListener listener) {
