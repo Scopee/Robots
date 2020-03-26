@@ -1,17 +1,12 @@
 package gui;
 
-import java.awt.Color;
-import java.awt.EventQueue;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
+import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import javax.swing.JPanel;
 
 public class GameVisualizer extends JPanel {
     private final Timer timer = initTimer();
@@ -104,15 +99,24 @@ public class GameVisualizer extends JPanel {
     private void moveRobot(double velocity, double angularVelocity, double duration) {
         velocity = applyLimits(velocity, 0, maxVelocity);
         angularVelocity = applyLimits(angularVelocity, -maxAngularVelocity, maxAngularVelocity);
-        double angleToTarget = angleTo(robotPositionX, robotPositionY, targetPositionX, targetPositionY);
-        if (Math.abs(angleToTarget - robotDirection) < 0.1) {
-            double newX = robotPositionX + Math.cos(angleToTarget) * duration * velocity;
-            robotPositionX = newX;
-            double newY = robotPositionY + Math.sin(angleToTarget) * duration * velocity;
-            robotPositionY = newY;
-        } else {
-            robotDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
+        double newX = robotPositionX + velocity / angularVelocity *
+                (Math.sin(robotDirection + angularVelocity * duration) -
+                        Math.sin(robotDirection));
+        if (!Double.isFinite(newX)) {
+            newX = robotPositionX + velocity * duration * Math.cos(robotDirection);
         }
+        double newY = robotPositionY - velocity / angularVelocity *
+                (Math.cos(robotDirection + angularVelocity * duration) -
+                        Math.cos(robotDirection));
+        if (!Double.isFinite(newY)) {
+            newY = robotPositionY + velocity * duration * Math.sin(robotDirection);
+        }
+        newX = applyLimits(newX, 15, getWidth() - 15);
+        newY = applyLimits(newY, 15, getHeight() - 15);
+        robotPositionX = newX;
+        robotPositionY = newY;
+        double newDirection = asNormalizedRadians(robotDirection + angularVelocity * duration);
+        robotDirection = newDirection;
     }
 
     private static double asNormalizedRadians(double angle) {
