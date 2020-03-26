@@ -3,22 +3,15 @@ package log;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import java.util.concurrent.*;
-
-/**
- * TODO:
- *  Этот класс порождает утечку ресурсов (связанные слушатели оказываются
-*/
 public class LogWindowSource {
     private int queueLength;
-
-    private ConcurrentLinkedQueue<LogEntry> messages;
+    private MessageQueue messages;
     private final ArrayList<LogChangeListener> listeners;
     private volatile LogChangeListener[] activeListeners;
 
     public LogWindowSource(int queueLength) {
         this.queueLength = queueLength;
-        messages = new ConcurrentLinkedQueue<>();
+        messages = new MessageQueue(queueLength);
         listeners = new ArrayList<>();
     }
 
@@ -38,8 +31,6 @@ public class LogWindowSource {
 
     public void append(LogLevel logLevel, String strMessage) {
         LogEntry entry = new LogEntry(logLevel, strMessage);
-        if (messages.size() == queueLength)
-            messages.poll();
         messages.add(entry);
         LogChangeListener[] activeListeners = this.activeListeners;
         if (activeListeners == null) {
@@ -77,6 +68,7 @@ public class LogWindowSource {
         for (LogEntry entry : messages) {
             if (count >= startFrom && count <= indexTo)
                 entries.add(entry);
+            count++;
         }
         return entries;
     }
