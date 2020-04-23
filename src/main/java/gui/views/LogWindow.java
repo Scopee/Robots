@@ -1,13 +1,17 @@
-package gui;
+package gui.views;
 
+import com.google.gson.JsonSerializer;
+import gui.serialization.LogWindowSerializer;
+import gui.serialization.SavableInternalFrame;
 import log.LogChangeListener;
 import log.LogEntry;
 import log.LogWindowSource;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.ArrayList;
 
-public class LogWindow extends JInternalFrame implements LogChangeListener {
+public class LogWindow extends SavableInternalFrame implements LogChangeListener {
     private LogWindowSource logSource;
     private TextArea logContent;
 
@@ -34,6 +38,14 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
         logContent.invalidate();
     }
 
+    public ArrayList<LogEntry> getMessages() {
+        ArrayList<LogEntry> res = new ArrayList<>();
+        for (LogEntry e : logSource.all()) {
+            res.add(e);
+        }
+        return res;
+    }
+
     @Override
     public void onLogChanged() {
         EventQueue.invokeLater(this::updateLogContent);
@@ -42,5 +54,10 @@ public class LogWindow extends JInternalFrame implements LogChangeListener {
     @Override
     public void unregister() {
         logSource.unregisterListener(this);
+    }
+
+    @Override
+    public JsonSerializer getSerializer() {
+        return new LogWindowSerializer();
     }
 }

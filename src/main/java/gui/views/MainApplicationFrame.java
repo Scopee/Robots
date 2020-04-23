@@ -1,5 +1,11 @@
-package gui;
+package gui.views;
 
+import com.google.gson.JsonSerializer;
+import gui.FrameListener;
+import gui.RobotsProgram;
+import gui.WindowListener;
+import gui.serialization.MainFrameSerializer;
+import gui.serialization.SavableInternalFrame;
 import log.Logger;
 
 import javax.swing.*;
@@ -10,12 +16,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class MainApplicationFrame extends JFrame {
-    private final JDesktopPane desktopPane = new JDesktopPane();
-
+    public final JDesktopPane desktopPane = new JDesktopPane();
+    public HashMap<String, SavableInternalFrame> frames;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
         //of the screen.
+        frames = new HashMap<>();
         int inset = 50;
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setBounds(inset, inset,
@@ -26,11 +33,11 @@ public class MainApplicationFrame extends JFrame {
         addWindowListener(new WindowListener(this));
 
         LogWindow logWindow = createLogWindow();
-        addWindow(logWindow);
+        addWindow(logWindow, "logWindow");
 
         GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
-        addWindow(gameWindow);
+        addWindow(gameWindow, "gameWindow");
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -46,7 +53,8 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
-    protected void addWindow(JInternalFrame frame) {
+    public void addWindow(JInternalFrame frame, String name) {
+        frames.put(name, (SavableInternalFrame) frame);
         desktopPane.add(frame);
         frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
         FrameListener listener = new FrameListener(frame);
@@ -66,8 +74,10 @@ public class MainApplicationFrame extends JFrame {
             this.invalidate();
         });
         lookAndFeelItems.put("Выход", (event) -> {
-            if (FrameListener.dialogAnswer(this) == JOptionPane.YES_OPTION)
+            if (FrameListener.dialogAnswer(this) == JOptionPane.YES_OPTION) {
+                RobotsProgram.save(this);
                 System.exit(0);
+            }
         });
         JMenu lookAndFeelMenu = createMenu("Режим отображения",
                 KeyEvent.VK_V,
@@ -108,5 +118,9 @@ public class MainApplicationFrame extends JFrame {
                 | IllegalAccessException | UnsupportedLookAndFeelException e) {
             // just ignore
         }
+    }
+
+    public static JsonSerializer getSerializer() {
+        return new MainFrameSerializer();
     }
 }

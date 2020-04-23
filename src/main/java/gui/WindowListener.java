@@ -1,7 +1,9 @@
 package gui;
 
+import gui.views.MainApplicationFrame;
+
 import javax.swing.*;
-import java.awt.event.*;
+import java.awt.event.WindowEvent;
 
 public class WindowListener implements java.awt.event.WindowListener {
 
@@ -19,6 +21,7 @@ public class WindowListener implements java.awt.event.WindowListener {
     @Override
     public void windowClosing(WindowEvent e) {
         if (FrameListener.dialogAnswer(pane) == JOptionPane.YES_OPTION){
+            RobotsProgram.save((MainApplicationFrame) pane);
             System.exit(0);
         }
     }
