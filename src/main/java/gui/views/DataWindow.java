@@ -14,10 +14,11 @@ public class DataWindow extends SavableInternalFrame implements Observer {
     private TextArea infoContent;
 
     public DataWindow() {
-        super("Игровое поле", true, true, true, true);
+        super("Данные о роботе", true, true, true, true);
+        setSize(300,100);
         infoContent = new TextArea("");
         infoContent.setBackground(Color.WHITE);
-        infoContent.setSize(500, 500);
+        infoContent.setSize(300, 100);
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(infoContent,BorderLayout.CENTER);
         getContentPane().add(panel);
@@ -46,7 +47,7 @@ public class DataWindow extends SavableInternalFrame implements Observer {
     }
 
     private void setInfo(double x, double y, double direction) {
-        String text = "X: " + x + "\nY: " + y + "\nDirection" + direction;
+        String text = "X: " + x + "\nY: " + y + "\nDirection: " + direction;
         infoContent.setText(text);
         infoContent.invalidate();
     }
