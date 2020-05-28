@@ -83,7 +83,8 @@ public class RobotsProgram {
             }
             GameWindow gw = (GameWindow) frame.frames.get("gameWindow");
             DataWindow dw = (DataWindow) frame.frames.get("dataWindow");
-            gw.getRobot().registerObserver(dw);
+            gw.getRobot().addObserver(dw);
+            dw.setRobot(gw.getRobot());
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }

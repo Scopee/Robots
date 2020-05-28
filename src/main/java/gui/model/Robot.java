@@ -1,7 +1,6 @@
 package gui.model;
 
 import java.util.Observable;
-import java.util.Observer;
 
 public class Robot extends Observable {
     private volatile double x;
@@ -27,10 +26,6 @@ public class Robot extends Observable {
 
     public double getDirection() {
         return direction;
-    }
-
-    public void registerObserver(Observer o){
-        addObserver(o);
     }
 
     public void onModelUpdateEvent(int targetX, int targetY, int width, int height) {

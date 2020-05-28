@@ -38,6 +38,13 @@ public class DataWindow extends SavableInternalFrame implements Observer {
         setInfo(x, y, direction);
     }
 
+    public void setRobot(Robot robot){
+        double x = robot.getX();
+        double y = robot.getY();
+        double direction = robot.getDirection();
+        setInfo(x, y, direction);
+    }
+
     private void setInfo(double x, double y, double direction) {
         String text = "X: " + x + "\nY: " + y + "\nDirection" + direction;
         infoContent.setText(text);

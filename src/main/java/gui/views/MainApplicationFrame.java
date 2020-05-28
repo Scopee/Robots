@@ -18,8 +18,6 @@ import java.util.Map;
 public class MainApplicationFrame extends JFrame {
     public final JDesktopPane desktopPane = new JDesktopPane();
     public HashMap<String, SavableInternalFrame> frames;
-    private GameWindow gameWindow;
-    private DataWindow dataWindow;
 
     public MainApplicationFrame() {
         //Make the big window be indented 50 pixels from each edge
@@ -37,13 +35,14 @@ public class MainApplicationFrame extends JFrame {
         LogWindow logWindow = createLogWindow();
         addWindow(logWindow, "logWindow");
 
-        gameWindow = new GameWindow();
+        GameWindow gameWindow = new GameWindow();
         gameWindow.setSize(400, 400);
         addWindow(gameWindow, "gameWindow");
 
-        dataWindow = new DataWindow();
+        DataWindow dataWindow = new DataWindow();
         addWindow(dataWindow, "dataWindow");
-        registerDataObserver();
+        dataWindow.setRobot(gameWindow.getRobot());
+        gameWindow.getRobot().addObserver(dataWindow);
 
         setJMenuBar(generateMenuBar());
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -57,10 +56,6 @@ public class MainApplicationFrame extends JFrame {
         logWindow.pack();
         Logger.debug("Протокол работает");
         return logWindow;
-    }
-
-    public void registerDataObserver(){
-        gameWindow.getRobot().registerObserver(dataWindow);
     }
 
     public void addWindow(JInternalFrame frame, String name) {
