@@ -4,6 +4,8 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import gui.serialization.Savable;
+import gui.views.DataWindow;
+import gui.views.GameWindow;
 import gui.views.MainApplicationFrame;
 
 import javax.swing.*;
@@ -57,8 +59,10 @@ public class RobotsProgram {
 
     public static void load() {
         File file = new File(FILENAME);
-        if (!file.exists())
+        if (!file.exists()) {
+            frame = new MainApplicationFrame();
             return;
+        }
         try (Scanner in = new Scanner(file)) {
             String jsonString = in.nextLine();
             JsonObject json = new JsonParser().parse(jsonString).getAsJsonObject();
@@ -77,6 +81,9 @@ public class RobotsProgram {
                 frame.desktopPane.remove(internalFrame);
                 frame.addWindow((JInternalFrame) s, name);
             }
+            GameWindow gw = (GameWindow) frame.frames.get("gameWindow");
+            DataWindow dw = (DataWindow) frame.frames.get("dataWindow");
+            gw.getRobot().registerObserver(dw);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
