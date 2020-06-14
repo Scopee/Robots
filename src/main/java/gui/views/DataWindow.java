@@ -15,12 +15,12 @@ public class DataWindow extends SavableInternalFrame implements Observer {
 
     public DataWindow() {
         super("Данные о роботе", true, true, true, true);
-        setSize(300,100);
+        setSize(300, 100);
         infoContent = new TextArea("");
         infoContent.setBackground(Color.WHITE);
         infoContent.setSize(300, 100);
         JPanel panel = new JPanel(new BorderLayout());
-        panel.add(infoContent,BorderLayout.CENTER);
+        panel.add(infoContent, BorderLayout.CENTER);
         getContentPane().add(panel);
         pack();
     }
@@ -33,13 +33,10 @@ public class DataWindow extends SavableInternalFrame implements Observer {
     @Override
     public void update(Observable o, Object arg) {
         Robot robot = (Robot) arg;
-        double x = robot.getX();
-        double y = robot.getY();
-        double direction = robot.getDirection();
-        setInfo(x, y, direction);
+        setInfo(robot.getX(), robot.getY(), robot.getDirection());
     }
 
-    public void setRobot(Robot robot){
+    public void setRobot(Robot robot) {
         double x = robot.getX();
         double y = robot.getY();
         double direction = robot.getDirection();
@@ -47,7 +44,7 @@ public class DataWindow extends SavableInternalFrame implements Observer {
     }
 
     private void setInfo(double x, double y, double direction) {
-        String text = "X: " + x + "\nY: " + y + "\nDirection: " + direction;
+        String text = String.format("X: %.1f\nY: %.1f\nDirection: %.1f", x, y, direction);
         infoContent.setText(text);
         infoContent.invalidate();
     }

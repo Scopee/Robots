@@ -48,6 +48,15 @@ public class MainApplicationFrame extends JFrame {
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
     }
 
+    public void addWindow(JInternalFrame frame, String name) {
+        frames.put(name, (SavableInternalFrame) frame);
+        desktopPane.add(frame);
+        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+        FrameListener listener = new FrameListener(frame);
+        frame.addInternalFrameListener(listener);
+        frame.setVisible(true);
+    }
+
     protected LogWindow createLogWindow() {
         LogWindow logWindow = new LogWindow(Logger.getDefaultLogSource());
         logWindow.setLocation(10, 10);
@@ -58,13 +67,8 @@ public class MainApplicationFrame extends JFrame {
         return logWindow;
     }
 
-    public void addWindow(JInternalFrame frame, String name) {
-        frames.put(name, (SavableInternalFrame) frame);
-        desktopPane.add(frame);
-        frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
-        FrameListener listener = new FrameListener(frame);
-        frame.addInternalFrameListener(listener);
-        frame.setVisible(true);
+    public static JsonSerializer getSerializer() {
+        return new MainFrameSerializer();
     }
 
     private JMenuBar generateMenuBar() {
@@ -123,9 +127,5 @@ public class MainApplicationFrame extends JFrame {
                 | IllegalAccessException | UnsupportedLookAndFeelException e) {
             // just ignore
         }
-    }
-
-    public static JsonSerializer getSerializer() {
-        return new MainFrameSerializer();
     }
 }

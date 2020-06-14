@@ -29,15 +29,6 @@ public class LogWindow extends SavableInternalFrame implements LogChangeListener
         updateLogContent();
     }
 
-    private void updateLogContent() {
-        StringBuilder content = new StringBuilder();
-        for (LogEntry entry : logSource.all()) {
-            content.append(entry.getMessage()).append("\n");
-        }
-        logContent.setText(content.toString());
-        logContent.invalidate();
-    }
-
     public ArrayList<LogEntry> getMessages() {
         ArrayList<LogEntry> res = new ArrayList<>();
         for (LogEntry e : logSource.all()) {
@@ -59,5 +50,14 @@ public class LogWindow extends SavableInternalFrame implements LogChangeListener
     @Override
     public JsonSerializer getSerializer() {
         return new LogWindowSerializer();
+    }
+
+    private void updateLogContent() {
+        StringBuilder content = new StringBuilder();
+        for (LogEntry entry : logSource.all()) {
+            content.append(entry.getMessage()).append("\n");
+        }
+        logContent.setText(content.toString());
+        logContent.invalidate();
     }
 }

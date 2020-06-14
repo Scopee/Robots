@@ -47,6 +47,14 @@ public class GameVisualizer extends JPanel {
         setDoubleBuffered(true);
     }
 
+    @Override
+    public void paint(Graphics g) {
+        super.paint(g);
+        Graphics2D g2d = (Graphics2D) g;
+        drawRobot(g2d, round(robot.getX()), round(robot.getY()), robot.getDirection());
+        drawTarget(g2d, targetPositionX, targetPositionY);
+    }
+
     protected void setTargetPosition(Point p) {
         targetPositionX = p.x;
         targetPositionY = p.y;
@@ -71,14 +79,6 @@ public class GameVisualizer extends JPanel {
 
     private static int round(double value) {
         return (int) (value + 0.5);
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D g2d = (Graphics2D) g;
-        drawRobot(g2d, round(robot.getX()), round(robot.getY()), robot.getDirection());
-        drawTarget(g2d, targetPositionX, targetPositionY);
     }
 
     private static void fillOval(Graphics g, int centerX, int centerY, int diam1, int diam2) {
